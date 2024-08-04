@@ -80,19 +80,8 @@
     </div>
 
     <div class="container">
-        <div class="menu">
-            <a href="game.html">Game</a>
-            <a href="https://id.pinterest.com/ryderhylee/shiroko/">Pinterest Sunaookami Shiroko</a>
-            <a href="https://wallhaven.cc/">Wallhaven.cc</a>
-            <a href="https://konachan.net/post">Konachan.net</a>
-            <a href="https://www.deviantart.com/">Deviantart.com</a>
-            <a href="https://www.pixiv.net/en/">Pixiv.net</a>
-            <a href="http://www.minitokyo.net/">Minitokyo.net</a>
-            <a href="https://wall.alphacoders.com/">Wallpaper Abyss / wall.alphacoders.com</a>
-            <a href="https://www.zerochan.net/">Zerochan.net</a>
-            <a href="https://wallpaperscraft.com/catalog/anime">Wallpaperscraft.com</a>
-            <a href="https://yande.re/post/show/831807">Yande.re</a>
-            <a href="https://wallpaperwaifu.com/">WallpaperWaifu.com</a>
+        <div class="menu" id="menu">
+            <!-- Links will be dynamically generated here -->
         </div>
         <div class="main">
             <h2>Welcome to My Wallpaper Collection</h2>
@@ -107,5 +96,26 @@
     <div class="footer">
         &copy; 2024 lusmaysh.com. All rights reserved.
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('list.txt')
+                .then(response => response.text())
+                .then(data => {
+                    const menu = document.getElementById('menu');
+                    const urls = data.split('\\n');
+                    urls.forEach(url => {
+                        if (url.trim()) {
+                            const a = document.createElement('a');
+                            a.href = url; //Use the line as URL
+                            a.textContent = url; //Display the URL text
+                            a.target = '_blank'; //Open link in a new tab
+                            menu.appendChild(a);
+                        }
+                    });
+                })
+                .catch(error => console.error('Error fetching list:', error));
+        });
+    </script>
 </body>
 </html>
