@@ -103,13 +103,14 @@
                 .then(response => response.text())
                 .then(data => {
                     const menu = document.getElementById('menu');
-                    const urls = data.split('\\n');
+                    const urls = data.split('\n');
                     urls.forEach(url => {
-                        if (url.trim()) {
+                        url = url.trim(); // Trim each URL
+                        if (url) {
                             const a = document.createElement('a');
-                            a.href = url; //Use the line as URL
-                            a.textContent = url; //Display the URL text
-                            a.target = '_blank'; //Open link in a new tab
+                            a.href = url;
+                            a.textContent = url;
+                            a.target = '_blank';
                             menu.appendChild(a);
                         }
                     });
