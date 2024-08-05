@@ -99,17 +99,27 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM fully loaded and parsed');
             fetch('list.txt')
-                .then(response => response.text())
+                .then(response => {
+                    console.log('Fetching list.txt');
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok ' + response.statusText);
+                    }
+                    return response.text();
+                })
                 .then(data => {
+                    console.log('Fetched data:', data);
                     const menu = document.getElementById('menu');
                     const urls = data.split('\n');
                     urls.forEach(url => {
                         url = url.trim(); // Trim each URL
                         if (url) {
+                            console.log('Creating link for:', url);
                             const a = document.createElement('a');
                             a.href = url;
-                            a.textContent = url;
+                            // Remove http:// or https:// and trailing slash
+                            a.textContent = url.replace(/^https?:\/\//, '').replace(/\/$/, '');
                             a.target = '_blank';
                             menu.appendChild(a);
                         }
