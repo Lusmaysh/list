@@ -1,3 +1,2 @@
-# Testing a features
-
-Do you want to [Try](https://lusmaysh.github.io/wallpaper/)
+# Wallpapers
+[lusmaysh.github.io/wallpaper](https://lusmaysh.github.io/wallpaper/)
