@@ -54,11 +54,11 @@
         .link-list a {
             display: block;
             padding: 15px;
-            background-color: #FFFFFF;
+            background-color: #FFFFFF; /* Light mode background */
             border: 1px solid #E0E0E0;
             border-radius: 5px;
             text-decoration: none;
-            color: #4A90E2;
+            color: #4A90E2; /* Light mode text color */
             font-weight: bold;
             transition: all 0.3s ease;
         }
@@ -70,12 +70,44 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
+        /* Dark mode styles for links */
+        body.dark-mode .link-list a {
+            background-color: #444; /* Dark mode background */
+            color: #f9f9f9; /* Dark mode text color */
+            border: 1px solid #666; /* Dark mode border */
+        }
+
+        body.dark-mode .link-list a:hover {
+            background-color: #4A90E2; /* Dark mode hover color */
+            color: white;
+        }
+
         footer {
             text-align: center;
             padding: 20px 0;
             margin-top: 30px;
             font-size: 0.9em;
             color: #777;
+        }
+
+        /* GitHub Icon */
+        .github-icon {
+            font-size: 24px;
+            color: #4A90E2; /* Light mode color */
+            margin-top: 10px;
+            transition: color 0.3s; /* Smooth transition for color change */
+        }
+
+        body.dark-mode .github-icon {
+            color: #f9f9f9; /* Dark mode color */
+        }
+
+        .github-icon:hover {
+            color: #333; /* Change color on hover */
+        }
+        
+        body.dark-mode .github-icon:hover {
+            color: #4A90E2; /* Dark mode color */
         }
 
         /* Responsive Design */
@@ -134,17 +166,6 @@
 
         input:checked + .slider:before {
             transform: translateX(26px);
-        }
-
-        /* GitHub Icon */
-        .github-icon {
-            font-size: 24px;
-            color: #4A90E2;
-            margin-top: 10px;
-        }
-
-        .github-icon:hover {
-            color: #333; /* Change color on hover */
         }
     </style>
 </head>
