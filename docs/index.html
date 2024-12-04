@@ -1,132 +1,135 @@
-<!doctype html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wallpaper Collection</title>
+    <link rel="stylesheet" href="styles.css">
     <style>
+        /* styles.css */
+        * {
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: Verdana, sans-serif;
-            color: #444;
+            font-family: 'Arial', sans-serif;
             margin: 0;
-            background-color: #f9f9f9;
+            padding: 0;
+            background-color: #F0F4F8;
+            color: #333;
         }
-        .header {
-            background-color: #4CAF50;
-            padding: 20px;
-            text-align: center;
-            color: white;
-        }
-        .header h1 {
-            margin: 0;
-        }
+
         .container {
-            display: grid;
-            grid-template-columns: 1fr 3fr 1fr;
-            gap: 20px;
+            max-width: 800px;
+            margin: 0 auto;
             padding: 20px;
         }
-        .menu {
-            background-color: #f1f1f1;
-            padding: 15px;
+
+        header {
             text-align: center;
-            border-radius: 8px;
+            margin-bottom: 30px;
         }
-        .menu a {
+
+        header h1 {
+            font-size: 2.5em;
+            color: #4A90E2;
+        }
+
+        .link-list {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .link-list li {
+            margin: 15px 0;
+        }
+
+        .link-list a {
             display: block;
-            padding: 10px;
-            margin: 10px 0;
-            background-color: #ffffff;
-            color: #4CAF50;
-            text-decoration: none;
-            border-radius: 5px;
-            transition: background-color 0.3s, color 0.3s;
-        }
-        .menu a:hover {
-            background-color: #4CAF50;
-            color: white;
-        }
-        .main {
-            background-color: #ffffff;
-            padding: 20px;
-            border-radius: 8px;
-        }
-        .about {
-            background-color: #f1f1f1;
             padding: 15px;
-            text-align: center;
-            border-radius: 8px;
+            background-color: #FFFFFF;
+            border: 1px solid #E0E0E0;
+            border-radius: 5px;
+            text-decoration: none;
+            color: #4A90E2;
+            font-weight: bold;
+            transition: all 0.3s ease;
         }
-        .about h2 {
-            margin-top: 0;
-        }
-        .footer {
-            background-color: #4CAF50;
+
+        .link-list a:hover {
+            background-color: #4A90E2;
             color: white;
-            text-align: center;
-            padding: 10px;
-            margin-top: 20px;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
-        @media (max-width: 768px) {
-            .container {
-                grid-template-columns: 1fr;
+
+        footer {
+            text-align: center;
+            padding: 20px 0;
+            margin-top: 30px;
+            font-size: 0.9em;
+            color: #777;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 600px) {
+            header h1 {
+                font-size: 2em;
+            }
+
+            .link-list a {
+                font-size: 16px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>Wallpaper Collection</h1>
-    </div>
-
     <div class="container">
-        <div class="menu" id="menu">
-            <!-- Links will be dynamically generated here -->
-        </div>
-        <div class="main">
-            <h2>Welcome to My Wallpaper Collection</h2>
-            <p>Here you will find links to my favorite wallpaper websites. Feel free to browse through and find the perfect wallpaper for your device.</p>
-        </div>
-        <div class="about">
-            <h2>About</h2>
-            <p>Just a list of my wallpaper collection</p>
-        </div>
-    </div>
-
-    <div class="footer">
-        &copy; 2024 lusmaysh.com. All rights reserved.
+        <header>
+            <h1>Wallpaper Collection</h1>
+        </header>
+        <main>
+            <ul id="menu" class="Link-list"></ul>
+        </main>
+        <footer>
+            &copy; 2024 lusmaysh.com. All rights reserved.
+            <div class="about">
+                
+            </div>
+        </footer>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOM fully loaded and parsed');
-            fetch('list.txt')
-                .then(response => {
-                    console.log('Fetching list.txt');
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok ' + response.statusText);
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('DOM fully loaded and parsed');
+        fetch('list.txt')
+            .then(response => {
+                console.log('Fetching list.txt');
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                return response.text();
+            })
+            .then(data => {
+                console.log('Fetched data:', data);
+                const menu = document.getElementById('menu'); // Ensure you have an element with id 'menu'
+                const urls = data.split('\n');
+                urls.forEach(url => {
+                    url = url.trim(); // Trim each URL
+                    if (url) {
+                        console.log('Creating link for:', url);
+                        const li = document.createElement('li'); // Create a new list item
+                        const a = document.createElement('a'); // Create a new anchor element
+                        a.href = url;
+                        // Remove http:// or https:// and trailing slash
+                        a.textContent = url.replace(/^https?:\/\//, '').replace(/\/$/, '');
+                        a.target = '_blank';
+                        li.appendChild(a); // Append the anchor to the list item
+                        menu.appendChild(li); // Append the list item to the menu
                     }
-                    return response.text();
-                })
-                .then(data => {
-                    console.log('Fetched data:', data);
-                    const menu = document.getElementById('menu');
-                    const urls = data.split('\n');
-                    urls.forEach(url => {
-                        url = url.trim(); // Trim each URL
-                        if (url) {
-                            console.log('Creating link for:', url);
-                            const a = document.createElement('a');
-                            a.href = url;
-                            // Remove http:// or https:// and trailing slash
-                            a.textContent = url.replace(/^https?:\/\//, '').replace(/\/$/, '');
-                            a.target = '_blank';
-                            menu.appendChild(a);
-                        }
-                    });
-                })
-                .catch(error => console.error('Error fetching list:', error));
-        });
-    </script>
+                });
+            })
+            .catch(error => console.error('Error fetching list:', error));
+    });
+</script>
 </body>
 </html>
