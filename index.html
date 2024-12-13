@@ -203,7 +203,14 @@
                 toggle.checked = false; // Set the toggle to unchecked
             }
 
-            fetch('list.txt')
+            // Fungsi untuk memuat data dari list.txt
+            function loadData() {
+                fetch('list.txt', {
+                    method: 'GET',
+                    headers: {
+                        'Cache-Control': 'no-cache' // Pastikan browser tidak menggunakan cache lama
+                    }
+                })
                 .then(response => {
                     console.log('Fetching list.txt');
                     if (!response.ok) {
@@ -213,24 +220,57 @@
                 })
                 .then(data => {
                     console.log('Fetched data:', data);
- const menu = document.getElementById('menu'); // Ensure you have an element with id 'menu'
-                    const urls = data.split('\n');
-                    urls.forEach(url => {
-                        url = url.trim(); // Trim each URL
-                        if (url) {
-                            console.log('Creating link for:', url);
-                            const li = document.createElement('li'); // Create a new list item
-                            const a = document.createElement('a'); // Create a new anchor element
-                            a.href = url;
-                            // Remove http:// or https:// and trailing slash
-                            a.textContent = url.replace(/^https?:\/\//, '').replace(/\/$/, '');
-                            a.target = '_blank';
-                            li.appendChild(a); // Append the anchor to the list item
-                            menu.appendChild(li); // Append the list item to the menu
-                        }
-                    });
+
+                    // Simpan data ke localStorage bersama dengan timestamp
+                    localStorage.setItem('wallpaperList', data);
+                    localStorage.setItem('wallpaperListTimestamp', Date.now().toString());
+
+                    renderMenu(data);
                 })
                 .catch(error => console.error('Error fetching list:', error));
+            }
+
+            // Cek apakah data sudah ada di localStorage
+            const cachedData = localStorage.getItem('wallpaperList');
+            const cachedTimestamp = localStorage.getItem('wallpaperListTimestamp');
+            const currentTime = Date.now();
+
+            if (cachedData && cachedTimestamp) {
+                // Jika data ada di localStorage dan belum lebih dari 1 hari (24 jam), gunakan data cache
+                const cacheAge = currentTime - parseInt(cachedTimestamp, 10);
+                if (cacheAge < 86400000) { // 24 jam dalam milidetik
+                    console.log('Using cached data');
+                    renderMenu(cachedData);
+                } else {
+                    console.log('Cache expired. Reloading data.');
+                    loadData();
+                }
+            } else {
+                // Jika data tidak ada di cache, ambil dari server
+                console.log('No cache found. Fetching new data.');
+                loadData();
+            }
+
+            // Fungsi untuk merender menu dengan data
+            function renderMenu(data) {
+                const menu = document.getElementById('menu'); // Ensure you have an element with id 'menu'
+                const urls = data.split('\n');
+                menu.innerHTML = ''; // Kosongkan daftar menu terlebih dahulu
+                urls.forEach(url => {
+                    url = url.trim(); // Trim each URL
+                    if (url) {
+                        console.log('Creating link for:', url);
+                        const li = document.createElement('li'); // Create a new list item
+                        const a = document.createElement('a'); // Create a new anchor element
+                        a.href = url;
+                        // Remove http:// or https:// and trailing slash
+                        a.textContent = url.replace(/^https?:\/\//, '').replace(/\/$/, '');
+                        a.target = '_blank';
+                        li.appendChild(a); // Append the anchor to the list item
+                        menu.appendChild(li); // Append the list item to the menu
+                    }
+                });
+            }
 
             // Toggle dark/light mode
             toggle.addEventListener('change', function() {
