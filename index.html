@@ -7,23 +7,39 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        /* styles.css */
-        * {
-            box-sizing: border-box;
+        /* Define color palette */
+        :root {
+            --primary-color: #4A90E2;
+            --background-light: #F0F4F8;
+            --text-light: #333;
+            --link-light-bg: #FFFFFF;
+            --link-light-border: #E0E0E0;
+            --hover-light-bg: #4A90E2;
+            --hover-light-text: #FFFFFF;
+            --footer-text: #777;
+
+            /* Dark mode palette */
+            --background-dark: #0d1117;
+            --text-dark: #f9f9f9;
+            --link-dark-bg: #444;
+            --link-dark-border: #666;
+            --hover-dark-bg: #4A90E2;
+            --hover-dark-text: #FFFFFF;
         }
 
+        /* Apply colors based on mode */
         body {
             font-family: 'Arial', sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #F0F4F8;
-            color: #333;
+            background-color: var(--background-light);
+            color: var(--text-light);
             transition: background-color 0.3s, color 0.3s;
         }
 
         body.dark-mode {
-            background-color: #0d1117;
-            color: #f9f9f9;
+            background-color: var(--background-dark);
+            color: var(--text-dark);
         }
 
         .container {
@@ -39,7 +55,7 @@
 
         header h1 {
             font-size: 2.5em;
-            color: #4A90E2;
+            color: var(--primary-color);
         }
 
         .link-list {
@@ -54,32 +70,32 @@
         .link-list a {
             display: block;
             padding: 15px;
-            background-color: #FFFFFF; /* Light mode background */
-            border: 1px solid #E0E0E0;
+            background-color: var(--link-light-bg);
+            border: 1px solid var(--link-light-border);
             border-radius: 5px;
             text-decoration: none;
-            color: #4A90E2; /* Light mode text color */
+            color: var(--primary-color);
             font-weight: bold;
             transition: all 0.3s ease;
         }
 
         .link-list a:hover {
-            background-color: #4A90E2;
-            color: white;
+            background-color: var(--hover-light-bg);
+            color: var(--hover-light-text);
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
         /* Dark mode styles for links */
         body.dark-mode .link-list a {
-            background-color: #444; /* Dark mode background */
-            color: #f9f9f9; /* Dark mode text color */
-            border: 1px solid #666; /* Dark mode border */
+            background-color: var(--link-dark-bg);
+            color: var(--text-dark);
+            border: 1px solid var(--link-dark-border);
         }
 
         body.dark-mode .link-list a:hover {
-            background-color: #4A90E2; /* Dark mode hover color */
-            color: white;
+            background-color: var(--hover-dark-bg);
+            color: var(--hover-dark-text);
         }
 
         footer {
@@ -87,23 +103,23 @@
             padding: 20px 0;
             margin-top: 30px;
             font-size: 0.9em;
-            color: #777;
+            color: var(--footer-text);
         }
 
         /* GitHub Icon */
         .github-icon {
-            font-size: 36px; /* Increased size */
-            color: #4A90E2; /* Light mode color */
+            font-size: 36px;
+            color: var(--primary-color);
             margin-top: 10px;
-            transition: color 0.3s; /* Smooth transition for color change */
+            transition: color 0.3s;
         }
 
         body.dark-mode .github-icon {
-            color: #f9f9f9; /* Dark mode color */
+            color: var(--text-dark);
         }
 
         .github-icon:hover {
-            color: #333; /* Change color on hover */
+            color: #333;
         }
 
         /* Responsive Design */
@@ -139,7 +155,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-color: #2196f3; /* Light mode color */
+            background-color: var(--primary-color);
             transition: 0.4s;
             border-radius: 34px;
         }
@@ -157,11 +173,25 @@
         }
 
         input:checked + .slider {
-            background-color: #4A90E2; /* Dark mode color */
+            background-color: var(--hover-dark-bg);
         }
 
         input:checked + .slider:before {
             transform: translateX(26px);
+        }
+
+        /* Loading Indicator */
+        .loading {
+            text-align: center;
+            font-size: 1.2em;
+            color: var(--primary-color);
+            display: none; /* Default hidden */
+        }
+
+        /* Focus styles for accessibility */
+        a:focus, button:focus {
+            outline: 3px solid var(--primary-color);
+            outline-offset: 3px;
         }
     </style>
 </head>
@@ -170,11 +200,12 @@
         <header>
             <h1>Wallpaper Collection</h1>
             <label class="switch">
-                <input type="checkbox" id="modeToggle" />
+                <input type="checkbox" id="modeToggle" aria-label="Toggle dark mode" />
                 <div class="slider"></div>
             </label>
         </header>
         <main>
+            <div id="loading" class="loading" role="status">Loading wallpapers...</div>
             <ul id="menu" class="link-list"></ul>
         </main>
         <footer>
@@ -189,106 +220,111 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-        console.log('DOM fully loaded and parsed');
-    
-        const toggle = document.getElementById('modeToggle');
-    
-        // Check localStorage for the user's mode preference
-        const storedMode = localStorage.getItem('mode');
-        if (storedMode === 'dark') {
-            document.body.classList.add('dark-mode');
-            toggle.checked = true;
-        } else {
-            document.body.classList.remove('dark-mode');
-            toggle.checked = false;
-        }
-    
-        // Fungsi untuk memuat data dari list.txt
-        function loadData() {
-            fetch('list.txt', {
-                method: 'GET',
-                headers: {
-                    'Cache-Control': 'no-cache'
-                }
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok ' + response.statusText);
-                }
-                // Ambil header Last-Modified sebagai timestamp perubahan
-                const lastModified = response.headers.get('Last-Modified');
-                return response.text().then(data => ({ data, lastModified }));
-            })
-            .then(({ data, lastModified }) => {
-                console.log('Fetched data:', data);
-    
-                // Simpan data dan timestamp baru ke localStorage
-                localStorage.setItem('wallpaperList', data);
-                localStorage.setItem('wallpaperListTimestamp', Date.now().toString());
-                localStorage.setItem('wallpaperListLastModified', lastModified);
-    
-                renderMenu(data);
-            })
-            .catch(error => console.error('Error fetching list:', error));
-        }
-    
-        // Cek apakah data sudah ada di localStorage
-        const cachedData = localStorage.getItem('wallpaperList');
-        const cachedTimestamp = localStorage.getItem('wallpaperListTimestamp');
-        const cachedLastModified = localStorage.getItem('wallpaperListLastModified');
-        const currentTime = Date.now();
-    
-        if (cachedData && cachedTimestamp && cachedLastModified) {
-            const cacheAge = currentTime - parseInt(cachedTimestamp, 10);
-            
-            // Periksa apakah file 'list.txt' telah diperbarui dengan memeriksa Last-Modified header
-            fetch('list.txt', { method: 'HEAD' }) // Hanya memeriksa header
-                .then(response => {
-                    const serverLastModified = response.headers.get('Last-Modified');
-                    
-                    if (serverLastModified !== cachedLastModified || cacheAge >= 86400000) {
-                        console.log('File has been updated on the server or cache expired. Reloading data.');
-                        loadData();
-                    } else {
-                        console.log('Using cached data');
-                        renderMenu(cachedData);
+            console.log('DOM fully loaded and parsed');
+        
+            const toggle = document.getElementById('modeToggle');
+            const loadingIndicator = document.getElementById('loading');
+        
+            // Check localStorage for the user's mode preference
+            const storedMode = localStorage.getItem('mode');
+            if (storedMode === 'dark') {
+                document.body.classList.add('dark-mode');
+                toggle.checked = true;
+            } else {
+                document.body.classList.remove('dark-mode');
+                toggle.checked = false;
+            }
+        
+            // Fungsi untuk memuat data dari list.txt
+            function loadData() {
+                loadingIndicator.style.display = 'block'; // Show loading indicator
+                
+                fetch('list.txt', {
+                    method: 'GET',
+                    headers: {
+                        'Cache-Control': 'no-cache'
                     }
                 })
-                .catch(error => console.error('Error checking last modified:', error));
-        } else {
-            console.log('No cache found. Fetching new data.');
-            loadData();
-        }
-    
-        // Fungsi untuk merender menu dengan data
-        function renderMenu(data) {
-            const menu = document.getElementById('menu');
-            const urls = data.split('\n');
-            menu.innerHTML = '';
-            urls.forEach(url => {
-                url = url.trim();
-                if (url) {
-                    const li = document.createElement('li');
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.textContent = url.replace(/^https?:\/\//, '').replace(/\/$/, '');
-                    a.target = '_blank';
-                    li.appendChild(a);
-                    menu.appendChild(li);
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok ' + response.statusText);
+                    }
+                    // Ambil header Last-Modified sebagai timestamp perubahan
+                    const lastModified = response.headers.get('Last-Modified');
+                    return response.text().then(data => ({ data, lastModified }));
+                })
+                .then(({ data, lastModified }) => {
+                    console.log('Fetched data:', data);
+        
+                    // Simpan data dan timestamp baru ke localStorage
+                    localStorage.setItem('wallpaperList', data);
+                    localStorage.setItem('wallpaperListTimestamp', Date.now().toString());
+                    localStorage.setItem('wallpaperListLastModified', lastModified);
+        
+                    renderMenu(data);
+                })
+                .catch(error => console.error('Error fetching list:', error))
+                .finally(() => {
+                    loadingIndicator.style.display = 'none'; // Hide loading indicator after loading
+                });
+            }
+        
+            // Cek apakah data sudah ada di localStorage
+            const cachedData = localStorage.getItem('wallpaperList');
+            const cachedTimestamp = localStorage.getItem('wallpaperListTimestamp');
+            const cachedLastModified = localStorage.getItem('wallpaperListLastModified');
+        
+            if (cachedData && cachedTimestamp && cachedLastModified) {
+                const timeDiff = (Date.now() - parseInt(cachedTimestamp, 10)) / (1000 * 60);
+        
+                console.log('Data is cached. Cached timestamp:', new Date(parseInt(cachedTimestamp, 10)).toLocaleString());
+                console.log('Last modified:', cachedLastModified);
+        
+                if (timeDiff > 1) { // More than 1 minute
+                    console.log('More than 1 minute has passed since last fetch. Fetching again...');
+                    loadData(); // Load new data
+                } else {
+                    console.log('Using cached data.');
+                    renderMenu(cachedData); // Render cached data
+                }
+            } else {
+                console.log('No cached data found. Fetching data...');
+                loadData(); // Load new data
+            }
+        
+            // Fungsi untuk menampilkan data wallpaper ke dalam menu
+            function renderMenu(data) {
+                const menu = document.getElementById('menu');
+                menu.innerHTML = ''; // Kosongkan menu terlebih dahulu
+        
+                // Pisahkan setiap baris dari data dan buat elemen <li> untuk setiap baris
+                const lines = data.split('\n');
+                lines.forEach(function(line) {
+                    const trimmedLine = line.trim(); // Hilangkan spasi di awal dan akhir baris
+                    if (trimmedLine) {
+                        const li = document.createElement('li');
+                        const a = document.createElement('a');
+                        a.href = trimmedLine; // Gunakan baris sebagai URL
+                        a.textContent = trimmedLine; // Gunakan baris sebagai teks tautan
+                        a.target = '_blank'; // Buka tautan di tab baru
+                        a.setAttribute('aria-label', `Link to ${trimmedLine}`); // ARIA label for screen readers
+                        li.appendChild(a);
+                        menu.appendChild(li);
+                    }
+                });
+            }
+        
+            // Event listener untuk dark mode toggle
+            toggle.addEventListener('change', function() {
+                if (this.checked) {
+                    document.body.classList.add('dark-mode');
+                    localStorage.setItem('mode', 'dark');
+                } else {
+                    document.body.classList.remove('dark-mode');
+                    localStorage.setItem('mode', 'light');
                 }
             });
-        }
-    
-        // Toggle dark/light mode
-        toggle.addEventListener('change', function() {
-            document.body.classList.toggle('dark-mode');
-            if (document.body.classList.contains('dark-mode')) {
-                localStorage.setItem('mode', 'dark');
-            } else {
-                localStorage.setItem('mode', 'light');
-            }
         });
-    });
     </script>
 </body>
 </html>
